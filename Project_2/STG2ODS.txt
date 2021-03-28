@@ -1,0 +1,28 @@
+use DATABASE UDACITYPROJECT;
+use schema STAGING;
+create or replace file format myjsonformat type = 'JSON' strip_outer_array=true;
+create or replace stage my_json_stage file_format = myjsonformat;
+
+create table business(businessjson variant);
+put file:///Users/michal.janczyk/Desktop/Udacity_Data_Architect/Project_2/yelp_dataset/yelp_academic_dataset_business.json @my_json_stage auto_compress=true;
+copy into BUSINESS FROM @my_json_stage/yelp_academic_dataset_business.json.gz;
+
+create table review(reviewjson variant);
+put file:///Users/michal.janczyk/Desktop/Udacity_Data_Architect/Project_2/yelp_dataset/yelp_academic_dataset_review.json @my_json_stage auto_compress=true;
+copy into REVIEW FROM @my_json_stage/yelp_academic_dataset_review.json.gz file_format = (format_name = myjsonformat) on_error = 'skip_file';
+
+create table checkin(checkinjson variant);
+put file:///Users/michal.janczyk/Desktop/Udacity_Data_Architect/Project_2/yelp_dataset/yelp_academic_dataset_checkin.json @my_json_stage auto_compress=true;
+copy into CHECKIN FROM @my_json_stage/yelp_academic_dataset_checkin.json.gz file_format = (format_name = myjsonformat) on_error = 'skip_file';
+
+create table tip(tipjson variant);
+put file:///Users/michal.janczyk/Desktop/Udacity_Data_Architect/Project_2/yelp_dataset/yelp_academic_dataset_tip.json @my_json_stage auto_compress=true;
+copy into TIP FROM @my_json_stage/yelp_academic_dataset_tip.json.gz file_format = (format_name = myjsonformat) on_error = 'skip_file';
+
+create table user(userjson variant);
+put file:///Users/michal.janczyk/Desktop/Udacity_Data_Architect/Project_2/yelp_dataset/yelp_academic_dataset_user.json @my_json_stage auto_compress=true;
+copy into USER FROM @my_json_stage/yelp_academic_dataset_user.json.gz file_format = (format_name = myjsonformat) on_error = 'skip_file';
+
+create table covid(covidjson variant);
+put file:///Users/michal.janczyk/Desktop/Udacity_Data_Architect/Project_2/covid_19_dataset_2020_06_10/yelp_academic_dataset_covid_features.json @my_json_stage auto_compress=true;
+copy into COVID FROM @my_json_stage/yelp_academic_dataset_covid_features.json.gz file_format = (format_name = myjsonformat) on_error = 'skip_file';
