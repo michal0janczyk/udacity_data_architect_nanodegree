@@ -1,11 +1,11 @@
 drop table if exists ods_yelp_business_details;
 create table ods_yelp_business_details (
   address string,
-  attributes object,
+  attributes_alcohol string,
   business_id string,
-  categories array,
+  categories string,
   city string,
-  hours object,
+  hours string,
   is_open integer,
   latitude float,
   longitude float,
@@ -17,23 +17,63 @@ create table ods_yelp_business_details (
   constraint pk_business_id primary key (business_id)
 );
 
-insert into ods_yelp_business_details
+insert into ods_yelp_business_details(address, attributes_alcohol, business_id, categories, city, hours, is_open, latitude, longitude, business_name, postal_code, review_count, stars,state)
+with out_json as (
 select
-  BUSINESSJSON:address,
-  BUSINESSJSON:attributes,
-  BUSINESSJSON:business_id,
-  BUSINESSJSON:categories,
-  BUSINESSJSON:city,
-  BUSINESSJSON:hours,
-  BUSINESSJSON:is_open,
-  BUSINESSJSON:latitude,
-  BUSINESSJSON:longitude,
+  BUSINESSJSON:address as address,
+  BUSINESSJSON:business_id as business_id,
+  BUSINESSJSON:categories as categories,
+  BUSINESSJSON:city as city,
+  BUSINESSJSON:hours:Friday as hours,
+  BUSINESSJSON:is_open as is_open,
+  BUSINESSJSON:latitude as latitude,
+  BUSINESSJSON:longitude as longitude,
   BUSINESSJSON:name as business_name,
-  BUSINESSJSON:postal_code,
-  BUSINESSJSON:review_count,
-  BUSINESSJSON:stars,
-  BUSINESSJSON:state
-from "UDACITYPROJECT"."STAGING"."BUSINESS";
+  BUSINESSJSON:postal_code as postal_code,
+  BUSINESSJSON:review_count as review_count,
+  BUSINESSJSON:stars as stars,
+  BUSINESSJSON:state as state,
+  BUSINESSJSON:attributes:Alcohol::string as attributes_alcohol,
+  BUSINESSJSON:attributes:Ambience::string as attributes_ambience,
+  BUSINESSJSON:attributes:BikeParking::string as attributes_bike_parking,
+  BUSINESSJSON:attributes:BusinessAcceptsBitcoin::string as attributes_business_accepts_bitcoin,
+  BUSINESSJSON:attributes:BusinessAcceptsCreditCards::string as attributes_business_accepts_credit_cards,
+  BUSINESSJSON:attributes:BusinessParking::string as attributes_business_parking,
+  BUSINESSJSON:attributes:Caters::string as attributes_caters,
+  BUSINESSJSON:attributes:DogsAllowed::string as attributes_dogs_allowed,
+  BUSINESSJSON:attributes:GoodForMeal::string as attributes_good_for_meal,
+  BUSINESSJSON:attributes:HappyHour::string as attributes_happy_hour,
+  BUSINESSJSON:attributes:HasTV::string as attributes_has_tv,
+  BUSINESSJSON:attributes:NoiseLevel::string as attributes_noise_level,
+  BUSINESSJSON:attributes:OutdoorSeating::string as attributes_outdoor_seating,
+  BUSINESSJSON:attributes:RestaurantsAttire::string as attributes_restaurants_attire,
+  BUSINESSJSON:attributes:RestaurantsDelivery::string as attributes_restaurants_delivery,
+  BUSINESSJSON:attributes:RestaurantsGoodForGroups::string as attributes_restaurants_good_for_groups,
+  BUSINESSJSON:attributes:RestaurantsPriceRange2::string as attributes_restaurants_price_range2,
+  BUSINESSJSON:attributes:RestaurantsReservations::string as attributes_restaurants_reservations,
+  BUSINESSJSON:attributes:RestaurantsTableService::string as attributes_restaurants_table_service,
+  BUSINESSJSON:attributes:RestaurantsTakeOut::string as attributes_restaurants_take_out,
+  BUSINESSJSON:attributes:WheelchairAccessible::string as attributes_wheelchair_accessible,
+  BUSINESSJSON:attributes:WiFi::string as attributes_wifi
+from "UDACITYPROJECT"."STAGING"."BUSINESS",
+ lateral flatten(input => BUSINESSJSON:attributes)
+)
+select
+  address,
+  attributes_alcohol,
+  business_id,
+  categories,
+  city,
+  hours,
+  is_open,
+  latitude,
+  longitude,
+  business_name,
+  postal_code,
+  review_count,
+  stars,
+  state
+from out_json;
 
 drop table if exists ods_yelp_checkin_details;
 create table ods_yelp_checkin_details (
@@ -218,7 +258,6 @@ select
   REVIEWJSON:useful as review_useful,
   REVIEWJSON:user_id
 from "UDACITYPROJECT"."STAGING"."REVIEW";
-
 
 
 

@@ -197,19 +197,13 @@ from "UDACITYPROJECT"."ODS"."ODS_YELP_REVIEW_DETAILS";
 drop table if exists dwh_fact_yelp_restaurant_review;
 create table dwh_fact_yelp_restaurant_review(
     business_id string,
-    business_name string,
     review_id string,
-    review_date string,
     user_id string,
-    user_name string,
     temperature_date string,
     precipitation_date string,
     checkin_id int,
-    checkin_date string,
     tip_id int,
-    tip_text string,
     covid_id int,
-    highlights string,
   constraint fk_business_id foreign key (business_id) references ODS.ODS_YELP_BUSINESS_DETAILS(business_id),
   constraint fk_review_id foreign key (review_id) references ODS.ODS_YELP_REVIEW_DETAILS(review_id),
   constraint fk_user_id foreign key (user_id) references ODS.ODS_YELP_USER_DETAILS(user_id),
@@ -222,19 +216,13 @@ create table dwh_fact_yelp_restaurant_review(
 
 insert into dwh_fact_yelp_restaurant_review
 select distinct b.business_id,
-                b.business_name,
                 r.review_id,
-                left(r.review_date, 10),
                 u.user_id,
-                u.user_name,
                 (left(t.temperature_date, 4) || '-' || substr(t.temperature_date,5,2) || '-' || substr(t.temperature_date,7,2)),
                 (left(p.precipitation_date, 4) || '-' || substr(p.precipitation_date,5,2) || '-' || substr(p.precipitation_date,7,2)),
                 c.checkin_id,
-                c.checkin_date,
                 i.tip_id,
-                i.tip_text,
-                v.covid_id,
-                v.highlights
+                v.covid_id
 from  ODS.ODS_YELP_BUSINESS_DETAILS as b,
       ODS.ODS_YELP_REVIEW_DETAILS as r,
       ODS.ODS_YELP_USER_DETAILS as u,
