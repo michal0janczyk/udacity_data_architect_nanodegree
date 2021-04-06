@@ -19,6 +19,23 @@ create table tip(tipjson variant);
 put file:///Users/michal.janczyk/Desktop/Udacity_Data_Architect/Project_2/yelp_dataset/yelp_academic_dataset_tip.json @my_json_stage auto_compress=true;
 copy into TIP FROM @my_json_stage/yelp_academic_dataset_tip.json.gz file_format = (format_name = myjsonformat) on_error = 'skip_file';
 
+create or replace table tip (
+  business_id string,
+  compliment_count integer,
+  date string,
+  text string,
+  user_id string
+  );
+
+copy into tip(business_id,compliment_count,date,text, user_id)
+from (select parse_json($1):business_id,
+parse_json($1):compliment_count,
+parse_json($1):date,
+parse_json($1):text,
+parse_json($1):user_id
+from @my_json_stage/yelp_academic_dataset_tip.json.gz)
+on_error = 'continue';
+
 create table user(userjson variant);
 put file:///Users/michal.janczyk/Desktop/Udacity_Data_Architect/Project_2/yelp_dataset/yelp_academic_dataset_user.json @my_json_stage auto_compress=true;
 copy into USER FROM @my_json_stage/yelp_academic_dataset_user.json.gz file_format = (format_name = myjsonformat) on_error = 'skip_file';
